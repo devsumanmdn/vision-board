@@ -152,12 +152,13 @@ export default function TabOneScreen() {
         </Link>
       </View>
 
-      <FlashList
+      <FlashList<VisionItem>
         data={items}
         numColumns={2}
         renderItem={({ item, index }: { item: VisionItem; index: number }) => (
           <VisionCard item={item} index={index} />
         )}
+        // @ts-ignore
         estimatedItemSize={250}
         contentContainerStyle={{
           paddingHorizontal: Theme.Spacing.s,

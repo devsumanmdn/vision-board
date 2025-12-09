@@ -56,8 +56,8 @@ export default function DetailScreen() {
 
   // Dynamic Styles
   const gradientColors = isDark
-    ? ["transparent", "rgba(0,0,0,0.6)", backgroundColor]
-    : ["transparent", "rgba(255,255,255,0.6)", backgroundColor];
+    ? (["transparent", "rgba(0,0,0,0.6)", backgroundColor] as const)
+    : (["transparent", "rgba(255,255,255,0.6)", backgroundColor] as const);
 
   const blurTint = isDark ? "dark" : "light";
   const cardBg = isDark ? "rgba(30,30,30,0.6)" : "rgba(255,255,255,0.6)";

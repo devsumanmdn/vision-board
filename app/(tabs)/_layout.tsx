@@ -36,6 +36,17 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="actions"
+        options={{
+          title: "Actions",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="list-ul" color={color} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="two"
         options={{
@@ -43,6 +54,38 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => <ProfileTabIcon color={color} />,
+        }}
+      />
     </Tabs>
   );
+}
+
+import { auth } from "@/firebaseConfig";
+import { Image } from "react-native";
+
+function ProfileTabIcon({ color }: { color: string }) {
+  const user = auth.currentUser;
+
+  if (user?.photoURL) {
+    return (
+      <Image
+        source={{ uri: user.photoURL }}
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 14,
+          borderWidth: 1,
+          borderColor: color,
+        }}
+      />
+    );
+  }
+
+  return <TabBarIcon name="user-circle" color={color} />;
 }
