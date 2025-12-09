@@ -1,34 +1,56 @@
+import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
-import { Link } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, useRouter } from "expo-router";
+import { Plus } from "lucide-react-native";
 import React, { useMemo } from "react";
 import {
   ActivityIndicator,
-  FlatList,
   Pressable,
   StyleSheet,
+  useColorScheme as useNativeColorScheme,
   View,
 } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Text } from "@/components/Themed";
-import { useColorScheme } from "@/components/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { Theme } from "@/constants/Theme";
 import { useVisionStore, VisionItem } from "@/store/visionStore";
-import { Plus } from "lucide-react-native";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const VisionCard = ({ item, index }: { item: VisionItem; index: number }) => {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
+  const router = useRouter();
+  const colorScheme = useNativeColorScheme();
+  const theme = colorScheme ?? "light";
 
-  // Random height for masonry effect (mocking aspect ratio if no image size)
-  const height = useMemo(() => 150 + Math.random() * 100, []);
+  // Use fixed height for Grid layout since we are reverting from Masonry
+  const height = 200;
+
+  const handlePress = () => {
+    router.push(`/vision/${item.id}`);
+  };
 
   return (
-    <Link href={`/vision/${item.id}`} asChild>
+    <Animated.View
+      entering={FadeInDown.delay(index * 100).springify()}
+      style={{
+        flex: 1,
+        margin: Theme.Spacing.s,
+        height,
+        ...Theme.Shadows.medium,
+      }}
+    >
       <Pressable
-        style={[
+        onPress={handlePress}
+        style={({ pressed }) => [
           styles.card,
-          { backgroundColor: colors.surface, height, marginBottom: 12 },
+          {
+            backgroundColor: Colors[theme].surface,
+            transform: [{ scale: pressed ? 0.98 : 1 }],
+          },
         ]}
       >
         <Image
@@ -37,26 +59,44 @@ const VisionCard = ({ item, index }: { item: VisionItem; index: number }) => {
           contentFit="cover"
           transition={200}
         />
-        <View style={styles.cardOverlay}>
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.8)"]}
+          style={styles.cardGradient}
+        />
+        <View style={styles.cardContent}>
           <Text style={styles.cardText} numberOfLines={2}>
             {item.text}
           </Text>
+          <Text style={styles.cardDate}>
+            {new Date(item.createdAt).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}
+          </Text>
         </View>
       </Pressable>
-    </Link>
+    </Animated.View>
   );
 };
 
 export default function TabOneScreen() {
   const { items, subscribe, isLoading, isRefreshing, refresh } =
     useVisionStore();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
+  const colorScheme = useNativeColorScheme();
+  const theme = colorScheme ?? "light";
+  const colors = Colors[theme];
   const insets = useSafeAreaInsets();
 
   React.useEffect(() => {
     const unsubscribe = subscribe();
     return () => unsubscribe();
+  }, []);
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Morning delusion?";
+    if (hour < 18) return "Afternoon fantasy?";
+    return "Evening regrets?";
   }, []);
 
   if (isLoading && items.length === 0) {
@@ -78,40 +118,68 @@ export default function TabOneScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <Text style={styles.headerTitle}>The Wall of False Hope</Text>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + Theme.Spacing.m,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <View>
+          <Text style={[Theme.Typography.h1, { color: colors.text }]}>
+            The Wall
+          </Text>
+          <Text style={[Theme.Typography.caption, { color: colors.text }]}>
+            {greeting}
+          </Text>
+        </View>
+
+        <Link href="/add" asChild>
+          <Pressable
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.5 : 1,
+              backgroundColor: colors.surface,
+              padding: 10,
+              borderRadius: Theme.Radius.round,
+            })}
+          >
+            <Plus color={colors.text} size={28} />
+          </Pressable>
+        </Link>
       </View>
 
-      <FlatList
+      <FlashList
         data={items}
         numColumns={2}
-        renderItem={({ item, index }) => (
+        renderItem={({ item, index }: { item: VisionItem; index: number }) => (
           <VisionCard item={item} index={index} />
         )}
-        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 100 }}
+        estimatedItemSize={250}
+        contentContainerStyle={{
+          paddingHorizontal: Theme.Spacing.s,
+          paddingBottom: 100,
+        }}
         refreshing={isRefreshing}
         onRefresh={refresh}
+        showsVerticalScrollIndicator={false}
       />
 
       {items.length === 0 && (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyStateText}>
+          <Text
+            style={[
+              Theme.Typography.body,
+              { opacity: 0.5, fontStyle: "italic" },
+            ]}
+          >
             Empty... just like your resolve.
           </Text>
         </View>
       )}
-
-      {/* FAB */}
-      <Link href="/add" asChild>
-        <Pressable
-          style={[
-            styles.fab,
-            { backgroundColor: colors.primary, bottom: insets.bottom + 20 },
-          ]}
-        >
-          <Plus color="#FFF" size={32} />
-        </Pressable>
-      </Link>
     </View>
   );
 }
@@ -121,54 +189,43 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingBottom: 15,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-    fontStyle: "italic",
+    paddingHorizontal: Theme.Spacing.l,
+    paddingBottom: Theme.Spacing.m,
   },
   card: {
-    borderRadius: 16,
+    flex: 1,
+    borderRadius: Theme.Radius.l,
     overflow: "hidden",
-    marginHorizontal: 6,
     justifyContent: "flex-end",
   },
-  cardOverlay: {
-    padding: 12,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    width: "100%",
+  cardGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: "50%",
+  },
+  cardContent: {
+    padding: Theme.Spacing.m,
   },
   cardText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "700",
+    marginBottom: 4,
+    textShadowColor: "rgba(0,0,0,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  cardDate: {
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 12,
+    fontWeight: "500",
   },
   emptyState: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
     zIndex: -1,
-  },
-  emptyStateText: {
-    fontSize: 18,
-    opacity: 0.5,
-    fontStyle: "italic",
-  },
-  fab: {
-    position: "absolute",
-    right: 20,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
-    zIndex: 999,
   },
 });
