@@ -2,7 +2,13 @@ import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { ArrowLeft, Calendar, Sparkles, Trash2 } from "lucide-react-native";
+import {
+  ArrowLeft,
+  Calendar,
+  FileDown,
+  Sparkles,
+  Trash2,
+} from "lucide-react-native";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -20,6 +26,7 @@ import { Text, useThemeColor } from "@/components/Themed";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/context/ThemeContext";
 import { generateMilestones, Milestone } from "@/services/ai";
+import { generatePlanPDF } from "@/services/pdfGenerator";
 import { useVisionStore } from "@/store/visionStore";
 
 const { width, height } = Dimensions.get("window");
@@ -84,6 +91,26 @@ export default function DetailScreen() {
       alert("Failed to generate plan.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPDF = async () => {
+    if (!item) return;
+
+    setExporting(true);
+    try {
+      await generatePlanPDF({
+        goalText: item.text,
+        motivations: item.motivations || [],
+        schedule: item.schedule || [],
+        createdAt: item.createdAt,
+      });
+    } catch (e) {
+      console.error("PDF generation failed:", e);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -158,6 +185,22 @@ export default function DetailScreen() {
               onPress={handleDelete}
             >
               <Trash2 color={errorColor} size={22} />
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionBtn,
+                { backgroundColor: glassBg, borderColor: glassBorder },
+                pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] },
+              ]}
+              onPress={handleExportPDF}
+              disabled={exporting}
+            >
+              {exporting ? (
+                <ActivityIndicator color={textColor} size="small" />
+              ) : (
+                <FileDown color={textColor} size={22} />
+              )}
             </Pressable>
 
             <Pressable
