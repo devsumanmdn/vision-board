@@ -1,5 +1,6 @@
 import { Text, View } from "@/components/Themed";
 import { Theme } from "@/constants/Theme";
+import { useColorScheme } from "@/context/ThemeContext";
 import { useVisionStore } from "@/store/visionStore";
 import Checkbox from "expo-checkbox";
 import { useState } from "react";
@@ -7,8 +8,15 @@ import { FlatList, Pressable, StyleSheet } from "react-native";
 
 export default function ActionsScreen() {
   const { items } = useVisionStore();
-  // Filter out some real items to mix in, or just use mocks for the "funny" vibe
-  // For now, let's create a static list of "Daily Failures" to avoid
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  // Theme-aware colors
+  const backgroundColor = isDark ? "#0a0a0a" : "#F8F8FA";
+  const textColor = isDark ? "#FFFFFF" : "#1a1a1a";
+  const secondaryText = isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)";
+  const taskBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.03)";
+  const checkboxBorder = isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.2)";
 
   const [tasks, setTasks] = useState([
     { id: "1", text: "Pretend to understand the codebase", completed: false },
@@ -33,10 +41,14 @@ export default function ActionsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Today's Burdens</Text>
-        <Text style={styles.subtitle}>Execute or make excuses.</Text>
+    <View style={[styles.container, { backgroundColor }]}>
+      <View style={[styles.header, { backgroundColor: "transparent" }]}>
+        <Text style={[styles.title, { color: textColor }]}>
+          Today's Burdens
+        </Text>
+        <Text style={[styles.subtitle, { color: secondaryText }]}>
+          Execute or make excuses.
+        </Text>
       </View>
 
       <FlatList
@@ -46,18 +58,21 @@ export default function ActionsScreen() {
         renderItem={({ item }) => (
           <Pressable
             onPress={() => toggleTask(item.id)}
-            style={styles.taskItem}
+            style={[styles.taskItem, { backgroundColor: taskBg }]}
           >
             <Checkbox
               value={item.completed}
               onValueChange={() => toggleTask(item.id)}
-              color={item.completed ? "#4CAF50" : undefined}
+              color={item.completed ? "#4CAF50" : checkboxBorder}
               style={styles.checkbox}
             />
-            <View style={styles.textContainer}>
+            <View
+              style={[styles.textContainer, { backgroundColor: "transparent" }]}
+            >
               <Text
                 style={[
                   styles.taskText,
+                  { color: textColor },
                   item.completed && styles.completedText,
                 ]}
               >
@@ -96,7 +111,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: Theme.Spacing.m,
     borderRadius: Theme.Radius.m,
-    backgroundColor: "rgba(150, 150, 150, 0.1)", // Subtle background
     gap: Theme.Spacing.m,
   },
   checkbox: {

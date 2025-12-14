@@ -12,7 +12,6 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
-  useColorScheme,
   View,
 } from "react-native";
 import Animated, {
@@ -23,6 +22,7 @@ import Animated, {
 
 import { Text, useThemeColor } from "@/components/Themed";
 import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/context/ThemeContext";
 import {
   generateInterviewQuestion,
   generateSchedule,

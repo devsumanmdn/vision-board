@@ -11,7 +11,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  useColorScheme,
   View,
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
@@ -19,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Text, useThemeColor } from "@/components/Themed";
 import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/context/ThemeContext";
 import { generateMilestones, Milestone } from "@/services/ai";
 import { useVisionStore } from "@/store/visionStore";
 

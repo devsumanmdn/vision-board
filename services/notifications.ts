@@ -1,3 +1,4 @@
+import { useSettingsStore } from '@/store/settingsStore';
 import { VisionItem } from '@/store/visionStore';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
@@ -20,6 +21,13 @@ export const requestPermissions = async () => {
 
 export const scheduleRegimen = async (item: VisionItem) => {
   if (!item.schedule) return;
+
+  // Check if notifications are enabled in settings
+  const notificationsEnabled = useSettingsStore.getState().notificationsEnabled;
+  if (!notificationsEnabled) {
+    console.log("Notifications disabled by user");
+    return;
+  }
 
   const hasPermission = await requestPermissions();
   if (!hasPermission) {

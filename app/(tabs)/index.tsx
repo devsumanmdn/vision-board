@@ -4,26 +4,21 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
 import { Plus } from "lucide-react-native";
 import React, { useMemo } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  useColorScheme as useNativeColorScheme,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Text } from "@/components/Themed";
 import { Colors } from "@/constants/Colors";
 import { Theme } from "@/constants/Theme";
+import { useColorScheme } from "@/context/ThemeContext";
 import { useVisionStore, VisionItem } from "@/store/visionStore";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const VisionCard = ({ item, index }: { item: VisionItem; index: number }) => {
   const router = useRouter();
-  const colorScheme = useNativeColorScheme();
+  const colorScheme = useColorScheme();
   const theme = colorScheme ?? "light";
 
   // Use fixed height for Grid layout since we are reverting from Masonry
@@ -82,7 +77,7 @@ const VisionCard = ({ item, index }: { item: VisionItem; index: number }) => {
 export default function TabOneScreen() {
   const { items, subscribe, isLoading, isRefreshing, refresh } =
     useVisionStore();
-  const colorScheme = useNativeColorScheme();
+  const colorScheme = useColorScheme();
   const theme = colorScheme ?? "light";
   const colors = Colors[theme];
   const insets = useSafeAreaInsets();

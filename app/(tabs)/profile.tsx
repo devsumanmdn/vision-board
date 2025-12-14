@@ -1,19 +1,20 @@
-import { Text, View, useThemeColor } from "@/components/Themed";
+import { Text } from "@/components/Themed";
 import { Colors } from "@/constants/Colors";
 import { Theme } from "@/constants/Theme";
+import { useColorScheme } from "@/context/ThemeContext";
 import { auth } from "@/firebaseConfig";
+import { useSettingsStore } from "@/store/settingsStore";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
-import { useState } from "react";
 import {
   Image,
   Pressable,
   ScrollView,
   StyleSheet,
   Switch,
-  useColorScheme,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -24,29 +25,19 @@ export default function ProfileScreen() {
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
 
-  // Theme colors
-  const backgroundColor = useThemeColor(
-    { light: "#F5F5F7", dark: "#000" },
-    "background"
-  );
-  const textColor = useThemeColor({ light: "#000", dark: "#fff" }, "text");
-  const tintColor = useThemeColor(
-    { light: Colors.light.tint, dark: Colors.dark.tint },
-    "tint"
-  );
-  const secondaryText = useThemeColor({ light: "#666", dark: "#999" }, "icon");
-  const cardBg = useThemeColor(
-    { light: "rgba(255,255,255,0.8)", dark: "rgba(30,30,30,0.6)" },
-    "background"
-  );
-  const borderColor = useThemeColor(
-    { light: "rgba(0,0,0,0.1)", dark: "rgba(255,255,255,0.1)" },
-    "icon"
-  );
+  // Theme colors - improved contrast
+  const backgroundColor = isDark ? "#0a0a0a" : "#F8F8FA";
+  const textColor = isDark ? "#FFFFFF" : "#1a1a1a";
+  const tintColor = isDark ? Colors.dark.tint : Colors.light.tint;
+  const secondaryText = isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)";
+  const separatorColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)";
 
-  // Settings
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(isDark);
+  // Settings from store
+  const notificationsEnabled = useSettingsStore((s) => s.notificationsEnabled);
+  const setNotificationsEnabled = useSettingsStore(
+    (s) => s.setNotificationsEnabled
+  );
+  const toggleDarkMode = useSettingsStore((s) => s.toggleDarkMode);
 
   const handleLogout = async () => {
     try {
@@ -101,84 +92,76 @@ export default function ProfileScreen() {
         </Text>
       </View>
 
-      {/* Preferences Section */}
+      {/* Preferences Section - No box, just rows */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: secondaryText }]}>
           PREFERENCES
         </Text>
 
-        <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
-          <View style={styles.row}>
-            <View style={[styles.rowIcon, { backgroundColor: "#FF9500" }]}>
-              <FontAwesome name="bell" size={16} color="#fff" />
-            </View>
-            <Text style={[styles.rowText, { color: textColor }]}>
-              Notifications
-            </Text>
-            <Switch
-              value={notifications}
-              onValueChange={setNotifications}
-              trackColor={{ false: "#767577", true: tintColor }}
-            />
+        <View style={styles.row}>
+          <View style={[styles.rowIcon, { backgroundColor: "#FF9500" }]}>
+            <FontAwesome name="bell" size={16} color="#fff" />
           </View>
+          <Text style={[styles.rowText, { color: textColor }]}>
+            Notifications
+          </Text>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={setNotificationsEnabled}
+            trackColor={{ false: "#767577", true: tintColor }}
+          />
+        </View>
 
-          <View style={[styles.separator, { backgroundColor: borderColor }]} />
+        <View style={[styles.separator, { backgroundColor: separatorColor }]} />
 
-          <View style={styles.row}>
-            <View style={[styles.rowIcon, { backgroundColor: "#5856D6" }]}>
-              <FontAwesome name="moon-o" size={16} color="#fff" />
-            </View>
-            <Text style={[styles.rowText, { color: textColor }]}>
-              Dark Mode
-            </Text>
-            <Switch
-              value={darkMode}
-              onValueChange={setDarkMode}
-              trackColor={{ false: "#767577", true: tintColor }}
-            />
+        <View style={styles.row}>
+          <View style={[styles.rowIcon, { backgroundColor: "#5856D6" }]}>
+            <FontAwesome name="moon-o" size={16} color="#fff" />
           </View>
+          <Text style={[styles.rowText, { color: textColor }]}>Dark Mode</Text>
+          <Switch
+            value={isDark}
+            onValueChange={toggleDarkMode}
+            trackColor={{ false: "#767577", true: tintColor }}
+          />
         </View>
       </View>
 
-      {/* Account Section */}
+      <View
+        style={[styles.fullSeparator, { backgroundColor: separatorColor }]}
+      />
+
+      {/* Account Section - No box, just rows */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: secondaryText }]}>
           ACCOUNT
         </Text>
 
-        <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
-          <Pressable style={styles.row} onPress={() => {}}>
-            <View style={[styles.rowIcon, { backgroundColor: "#8E8E93" }]}>
-              <FontAwesome name="cog" size={16} color="#fff" />
-            </View>
-            <Text style={[styles.rowText, { color: textColor }]}>Settings</Text>
-            <FontAwesome name="chevron-right" size={14} color={secondaryText} />
-          </Pressable>
+        <Pressable style={styles.row} onPress={() => {}}>
+          <View style={[styles.rowIcon, { backgroundColor: "#8E8E93" }]}>
+            <FontAwesome name="cog" size={16} color="#fff" />
+          </View>
+          <Text style={[styles.rowText, { color: textColor }]}>Settings</Text>
+          <FontAwesome name="chevron-right" size={14} color={secondaryText} />
+        </Pressable>
 
-          <View style={[styles.separator, { backgroundColor: borderColor }]} />
+        <View style={[styles.separator, { backgroundColor: separatorColor }]} />
 
-          <Pressable style={styles.row} onPress={() => {}}>
-            <View style={[styles.rowIcon, { backgroundColor: "#34C759" }]}>
-              <FontAwesome name="info-circle" size={16} color="#fff" />
-            </View>
-            <Text style={[styles.rowText, { color: textColor }]}>About</Text>
-            <FontAwesome name="chevron-right" size={14} color={secondaryText} />
-          </Pressable>
-        </View>
+        <Pressable style={styles.row} onPress={() => {}}>
+          <View style={[styles.rowIcon, { backgroundColor: "#34C759" }]}>
+            <FontAwesome name="info-circle" size={16} color="#fff" />
+          </View>
+          <Text style={[styles.rowText, { color: textColor }]}>About</Text>
+          <FontAwesome name="chevron-right" size={14} color={secondaryText} />
+        </Pressable>
       </View>
 
+      <View
+        style={[styles.fullSeparator, { backgroundColor: separatorColor }]}
+      />
+
       {/* Logout */}
-      <Pressable
-        style={[
-          styles.logoutButton,
-          {
-            backgroundColor: isDark
-              ? "rgba(255,59,48,0.15)"
-              : "rgba(255,59,48,0.1)",
-          },
-        ]}
-        onPress={handleLogout}
-      >
+      <Pressable style={styles.logoutRow} onPress={handleLogout}>
         <Text style={styles.logoutText}>Log Out</Text>
       </Pressable>
 
@@ -240,7 +223,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   section: {
-    marginBottom: Theme.Spacing.l,
+    marginBottom: Theme.Spacing.m,
   },
   sectionTitle: {
     fontSize: 13,
@@ -248,11 +231,6 @@ const styles = StyleSheet.create({
     marginBottom: Theme.Spacing.s,
     marginLeft: Theme.Spacing.s,
     letterSpacing: 0.5,
-  },
-  card: {
-    borderRadius: Theme.Radius.l,
-    borderWidth: 1,
-    overflow: "hidden",
   },
   row: {
     flexDirection: "row",
@@ -276,10 +254,13 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     marginLeft: 56,
   },
-  logoutButton: {
-    marginTop: Theme.Spacing.m,
-    padding: Theme.Spacing.m,
-    borderRadius: Theme.Radius.m,
+  fullSeparator: {
+    height: StyleSheet.hairlineWidth,
+    marginVertical: Theme.Spacing.s,
+  },
+  logoutRow: {
+    paddingVertical: Theme.Spacing.m,
+    paddingHorizontal: Theme.Spacing.m,
     alignItems: "center",
   },
   logoutText: {
