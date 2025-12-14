@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Check, Clock, ImagePlus, Send } from "lucide-react-native"; // Renamed Calendar to CalendarIcon to avoid conflict
+import { Check, Clock, ImagePlus, Send, X } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -435,6 +435,16 @@ export default function ModalScreen() {
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+
+      {/* Close Button */}
+      <Pressable
+        style={styles.closeButton}
+        onPress={() => router.back()}
+        hitSlop={20}
+      >
+        <X size={24} color={textColor} />
+      </Pressable>
+
       {stage === "SETUP" && renderSetup()}
       {stage === "INTERVIEW" && renderInterview()}
       {stage === "PROPOSAL" && renderProposal()}
@@ -447,9 +457,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
   },
+  closeButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 100,
+    padding: 8,
+  },
   content: {
     gap: 24,
     flex: 1,
+    marginTop: 40,
   },
   header: {
     marginBottom: 10,
