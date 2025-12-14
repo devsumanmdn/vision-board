@@ -1,13 +1,5 @@
-import * as Google from "expo-auth-session/providers/google";
 import { Link, useRouter } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-import {
-  GoogleAuthProvider,
-  signInWithCredential,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { useEffect } from "react";
-
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 
@@ -15,52 +7,11 @@ import { Text, useThemeColor } from "@/components/Themed";
 import { Colors } from "@/constants/Colors";
 import { auth } from "@/firebaseConfig";
 
-WebBrowser.maybeCompleteAuthSession();
-
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    // In a real app, you'd use process.env.EXPO_PUBLIC_... for these IDs
-    // For this demo, we'll rely on the redirect URI proxy or configured scheme
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    redirectUri: "com.dreamdump.app:/oauth2redirect",
-  });
-
-  useEffect(() => {
-    if (request) {
-      console.log("Google Auth Request Config:");
-      console.log("- redirectUri:", request.redirectUri);
-      console.log(
-        "- androidClientId used:",
-        process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID
-      );
-      console.log("- request.url:", request.url);
-    }
-  }, [request]);
-
-  useEffect(() => {
-    if (response?.type === "success") {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-      setLoading(true);
-      signInWithCredential(auth, credential)
-        .then(() => {
-          router.replace("/(tabs)");
-        })
-        .catch((error) => {
-          alert("Google Sign-In Error: " + error.message);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [response]);
 
   const backgroundColor = useThemeColor(
     { light: "#fff", dark: "#121212" },
@@ -129,21 +80,6 @@ export default function LoginScreen() {
           <Text style={styles.buttonText}>
             {loading ? "Judging you..." : "Enter the Delusion"}
           </Text>
-        </Pressable>
-
-        <Pressable
-          style={[
-            styles.button,
-            {
-              backgroundColor: "#DB4437",
-              marginTop: 12,
-              opacity: !request ? 0.5 : 1,
-            },
-          ]}
-          disabled={!request || loading}
-          onPress={() => promptAsync()}
-        >
-          <Text style={styles.buttonText}>Sign in with Google</Text>
         </Pressable>
 
         <Link href="/(auth)/register" asChild>
