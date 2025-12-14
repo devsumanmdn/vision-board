@@ -1,13 +1,13 @@
 import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    orderBy,
+    query,
+    serverTimestamp,
+    updateDoc
 } from 'firebase/firestore';
 import { create } from 'zustand';
 import { auth, db } from '../firebaseConfig';
@@ -17,6 +17,20 @@ export interface Milestone {
   month: string;
   target: string;
   completed: boolean;
+  snark?: string;
+}
+
+export interface ScheduleItem {
+  id: string;
+  type: 'daily' | 'weekly' | 'custom';
+  time: string; // HH:mm
+  task: string;
+  activeDays: number[]; // 0-6 (Sun-Sat)
+}
+
+export interface InterviewData {
+  questions: { question: string; answer: string }[];
+  summary: string;
 }
 
 export interface VisionItem {
@@ -26,6 +40,11 @@ export interface VisionItem {
   createdAt: number;
   milestones: Milestone[];
   userId?: string;
+  
+  // New Dynamic Fields
+  interviewData?: InterviewData;
+  schedule?: ScheduleItem[];
+  motivations?: string[];
 }
 
 interface VisionState {
