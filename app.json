@@ -1,11 +1,14 @@
 {
   "expo": {
-    "name": "vision-board",
-    "slug": "vision-board",
+    "name": "DreamDump",
+    "slug": "dreamdump",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "visionboard",
+    "scheme": [
+      "dreamdump",
+      "com.dreamdump.app"
+    ],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -14,22 +17,31 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dreamdump.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.dreamdump.app",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
-
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d064a635-c885-404d-ac00-7a300a7df72c"
+      }
+    },
+    "owner": "devsumanmdn"
   }
 }

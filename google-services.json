@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "625498408796",
+    "project_id": "vision-board-8287d",
+    "storage_bucket": "vision-board-8287d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:625498408796:android:caa6d104fcc76ee33be399",
+        "android_client_info": {
+          "package_name": "com.dreamdump.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "625498408796-9mrml5sr1tb22h8nk8itmjhmb3mil9to.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyYKWUyWQAuboHm-VBgTf4mtjPdP5YSpU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "625498408796-9mrml5sr1tb22h8nk8itmjhmb3mil9to.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
