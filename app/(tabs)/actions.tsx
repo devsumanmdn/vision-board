@@ -94,7 +94,7 @@ export default function ActionsScreen() {
       </View>
 
       {hasNoActivePlans ? (
-        <View style={styles.emptyState}>
+        <View style={[styles.emptyState, { backgroundColor: "transparent" }]}>
           <Text style={[styles.emptyStateTitle, { color: textColor }]}>
             No Active Plans
           </Text>
@@ -103,7 +103,7 @@ export default function ActionsScreen() {
           </Text>
         </View>
       ) : hasActivePlansButNoTasksToday ? (
-        <View style={styles.emptyState}>
+        <View style={[styles.emptyState, { backgroundColor: "transparent" }]}>
           <Text style={[styles.emptyStateTitle, { color: textColor }]}>
             Rest Day
           </Text>
