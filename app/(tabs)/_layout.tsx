@@ -1,18 +1,12 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
+import { LayoutGrid, ListTodo, UserCircle } from "lucide-react-native";
 import React from "react";
+import { Image } from "react-native";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Colors } from "@/constants/Colors";
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import { auth } from "@/firebaseConfig";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -30,9 +24,9 @@ export default function TabLayout() {
         name="index"
         options={{
           headerShown: false,
-          title: "The Wall",
+          title: "Boards",
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="codepen" color={color} />
+            <LayoutGrid size={24} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -42,7 +36,7 @@ export default function TabLayout() {
         options={{
           title: "Actions",
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="list-ul" color={color} />
+            <ListTodo size={24} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -58,9 +52,6 @@ export default function TabLayout() {
   );
 }
 
-import { auth } from "@/firebaseConfig";
-import { Image } from "react-native";
-
 function ProfileTabIcon({ color }: { color: string }) {
   const user = auth.currentUser;
 
@@ -69,15 +60,15 @@ function ProfileTabIcon({ color }: { color: string }) {
       <Image
         source={{ uri: user.photoURL }}
         style={{
-          width: 28,
-          height: 28,
-          borderRadius: 14,
-          borderWidth: 1,
+          width: 26,
+          height: 26,
+          borderRadius: 13,
+          borderWidth: 1.5,
           borderColor: color,
         }}
       />
     );
   }
 
-  return <TabBarIcon name="user-circle" color={color} />;
+  return <UserCircle size={24} color={color} strokeWidth={2} />;
 }

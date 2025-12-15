@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Calendar,
   FileDown,
+  Play,
   Sparkles,
   Trash2,
 } from "lucide-react-native";
@@ -30,7 +31,7 @@ import { generatePlanPDF } from "@/services/pdfGenerator";
 import { useVisionStore } from "@/store/visionStore";
 
 const { width, height } = Dimensions.get("window");
-const IMG_HEIGHT = height * 0.6; // More immersive
+const IMG_HEIGHT = height * 0.4; // Reduced for better text placement
 
 export default function DetailScreen() {
   const { id } = useLocalSearchParams();
@@ -38,11 +39,13 @@ export default function DetailScreen() {
   const insets = useSafeAreaInsets();
   const item = useVisionStore((state) => state.items.find((i) => i.id === id));
   const deleteItem = useVisionStore((state) => state.deleteItem);
+  const startPlan = useVisionStore((state) => state.startPlan);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [loading, setLoading] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   // Theme colors
   const backgroundColor = useThemeColor(
@@ -96,6 +99,18 @@ export default function DetailScreen() {
 
   const [exporting, setExporting] = useState(false);
 
+  const handleStartPlan = async () => {
+    if (!item) return;
+    setStarting(true);
+    try {
+      await startPlan(item.id);
+    } catch (e) {
+      console.error("Failed to start plan:", e);
+    } finally {
+      setStarting(false);
+    }
+  };
+
   const handleExportPDF = async () => {
     if (!item) return;
 
@@ -123,7 +138,7 @@ export default function DetailScreen() {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="automatic"
       >
-        {/* Immersive Hero Section */}
+        {/* Hero Image Section */}
         <View style={styles.heroContainer}>
           <Image
             source={{ uri: item.imageUri }}
@@ -132,54 +147,68 @@ export default function DetailScreen() {
             transition={800}
           />
           <LinearGradient
-            colors={["rgba(0,0,0,0.3)", "transparent", ...gradientColors]}
-            locations={[0, 0.3, 0.6, 1]}
+            colors={["rgba(0,0,0,0.3)", "transparent"]}
+            locations={[0, 0.5]}
             style={styles.gradientOverlay}
           />
 
-          {/* Header Content */}
-          <View style={[styles.heroContent, { paddingBottom: 40 }]}>
-            <Animated.View entering={FadeInDown.delay(200).duration(800)}>
-              <Text style={[styles.heroTitle, { color: textColor }]}>
-                {item.text}
-              </Text>
-            </Animated.View>
-            <Animated.View
-              entering={FadeInDown.delay(400).duration(800)}
-              style={styles.dateContainer}
-            >
-              <BlurView intensity={20} tint={blurTint} style={styles.dateBadge}>
-                <Calendar size={14} color={secondaryText} />
-                <Text style={[styles.heroDate, { color: secondaryText }]}>
-                  {new Date(item.createdAt).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </Text>
-              </BlurView>
-            </Animated.View>
-          </View>
-
           {/* Back Button */}
           <Pressable
-            style={[styles.backButton, { top: insets.top + 10 }]}
+            style={[styles.backButton, { top: Math.max(insets.top, 12) }]}
             onPress={() => router.back()}
           >
             <BlurView intensity={40} tint={blurTint} style={styles.iconBlur}>
-              <ArrowLeft color={textColor} size={24} />
+              <ArrowLeft color="#fff" size={24} />
             </BlurView>
           </Pressable>
+        </View>
 
-          {/* Actions Bar - Floating over image/content transition */}
+        {/* Title and Date Section - Below Image */}
+        <View style={[styles.heroContent, { backgroundColor }]}>
+          <Animated.View entering={FadeInDown.delay(200).duration(800)}>
+            <Text style={[styles.heroTitle, { color: textColor }]}>
+              {item.text}
+            </Text>
+          </Animated.View>
+          <Animated.View
+            entering={FadeInDown.delay(400).duration(800)}
+            style={styles.dateContainer}
+          >
+            <View
+              style={[
+                styles.dateBadge,
+                {
+                  backgroundColor: glassBg,
+                  borderColor: glassBorder,
+                  borderWidth: 1,
+                },
+              ]}
+            >
+              <Calendar size={14} color={secondaryText} />
+              <Text style={[styles.heroDate, { color: secondaryText }]}>
+                {new Date(item.createdAt).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Actions Bar */}
           <Animated.View
             entering={FadeInUp.delay(600).springify()}
-            style={styles.actionsFloating}
+            style={styles.actionsRow}
           >
             <Pressable
               style={({ pressed }) => [
                 styles.actionBtn,
-                { backgroundColor: glassBg, borderColor: glassBorder },
+                {
+                  backgroundColor: glassBg,
+                  borderColor: isDark
+                    ? "rgba(255,255,255,0.3)"
+                    : "rgba(0,0,0,0.2)",
+                },
                 pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] },
               ]}
               onPress={handleDelete}
@@ -190,7 +219,12 @@ export default function DetailScreen() {
             <Pressable
               style={({ pressed }) => [
                 styles.actionBtn,
-                { backgroundColor: glassBg, borderColor: glassBorder },
+                {
+                  backgroundColor: glassBg,
+                  borderColor: isDark
+                    ? "rgba(255,255,255,0.3)"
+                    : "rgba(0,0,0,0.2)",
+                },
                 pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] },
               ]}
               onPress={handleExportPDF}
@@ -203,24 +237,61 @@ export default function DetailScreen() {
               )}
             </Pressable>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.generateBtn,
-                { backgroundColor: tintColor },
-                pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] },
-              ]}
-              onPress={handleGeneratePlan}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFF" size="small" />
+            {/* Start Plan / Plan Active Button */}
+            {item.schedule &&
+              item.schedule.length > 0 &&
+              (item.startedAt ? (
+                <View
+                  style={[
+                    styles.generateBtn,
+                    { backgroundColor: "#4CAF50", opacity: 0.8 },
+                  ]}
+                >
+                  <Play color="#FFF" size={20} />
+                  <Text style={styles.generateBtnText}>Active</Text>
+                </View>
               ) : (
-                <Sparkles color="#FFF" size={20} />
-              )}
-              <Text style={styles.generateBtnText}>
-                {loading ? "Manifesting..." : "Reveal the Path"}
-              </Text>
-            </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.generateBtn,
+                    { backgroundColor: tintColor },
+                    pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] },
+                  ]}
+                  onPress={handleStartPlan}
+                  disabled={starting}
+                >
+                  {starting ? (
+                    <ActivityIndicator color="#FFF" size="small" />
+                  ) : (
+                    <Play color="#FFF" size={20} />
+                  )}
+                  <Text style={styles.generateBtnText}>
+                    {starting ? "Starting..." : "Start Plan"}
+                  </Text>
+                </Pressable>
+              ))}
+
+            {/* Generate Plan Button - show only if no schedule */}
+            {(!item.schedule || item.schedule.length === 0) && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.generateBtn,
+                  { backgroundColor: tintColor },
+                  pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] },
+                ]}
+                onPress={handleGeneratePlan}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFF" size="small" />
+                ) : (
+                  <Sparkles color="#FFF" size={20} />
+                )}
+                <Text style={styles.generateBtnText}>
+                  {loading ? "Manifesting..." : "Reveal the Path"}
+                </Text>
+              </Pressable>
+            )}
           </Animated.View>
         </View>
 
@@ -410,7 +481,6 @@ const styles = StyleSheet.create({
     height: IMG_HEIGHT,
     width: width,
     position: "relative",
-    justifyContent: "flex-end",
   },
   heroImage: {
     ...StyleSheet.absoluteFillObject,
@@ -420,18 +490,16 @@ const styles = StyleSheet.create({
   },
   heroContent: {
     paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
     width: "100%",
-    zIndex: 10,
   },
   heroTitle: {
-    fontSize: 42,
-    fontWeight: "900", // Heavy aesthetic
+    fontSize: 36,
+    fontWeight: "900",
     marginBottom: 12,
-    lineHeight: 46,
+    lineHeight: 42,
     letterSpacing: -1,
-    textShadowColor: "rgba(0,0,0,0.2)",
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   dateContainer: {
     flexDirection: "row",
@@ -463,12 +531,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  actionsFloating: {
+  actionsRow: {
     flexDirection: "row",
     gap: 12,
-    paddingHorizontal: 24,
-    marginBottom: -28, // Float half out
-    zIndex: 20,
+    marginTop: 16,
   },
   actionBtn: {
     width: 56,
@@ -498,7 +564,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   body: {
-    paddingTop: 48, // Space for floating buttons
+    paddingTop: 24,
     paddingHorizontal: 20,
   },
   sectionTitle: {

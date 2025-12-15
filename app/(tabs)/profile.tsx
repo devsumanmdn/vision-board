@@ -4,10 +4,18 @@ import { Theme } from "@/constants/Theme";
 import { useColorScheme } from "@/context/ThemeContext";
 import { auth } from "@/firebaseConfig";
 import { useSettingsStore } from "@/store/settingsStore";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
+import {
+  Bell,
+  ChevronRight,
+  Info,
+  Moon,
+  Pencil,
+  Settings,
+  User,
+} from "lucide-react-native";
 import {
   Image,
   Pressable,
@@ -76,11 +84,11 @@ export default function ProfileScreen() {
                 { backgroundColor: tintColor },
               ]}
             >
-              <FontAwesome name="user" size={40} color="#fff" />
+              <User size={40} color="#fff" strokeWidth={1.5} />
             </View>
           )}
           <View style={[styles.editBadge, { backgroundColor: tintColor }]}>
-            <FontAwesome name="pencil" size={12} color="#fff" />
+            <Pencil size={12} color="#fff" strokeWidth={2.5} />
           </View>
         </View>
 
@@ -100,7 +108,7 @@ export default function ProfileScreen() {
 
         <View style={styles.row}>
           <View style={[styles.rowIcon, { backgroundColor: "#FF9500" }]}>
-            <FontAwesome name="bell" size={16} color="#fff" />
+            <Bell size={16} color="#fff" strokeWidth={2} />
           </View>
           <Text style={[styles.rowText, { color: textColor }]}>
             Notifications
@@ -116,7 +124,7 @@ export default function ProfileScreen() {
 
         <View style={styles.row}>
           <View style={[styles.rowIcon, { backgroundColor: "#5856D6" }]}>
-            <FontAwesome name="moon-o" size={16} color="#fff" />
+            <Moon size={16} color="#fff" strokeWidth={2} />
           </View>
           <Text style={[styles.rowText, { color: textColor }]}>Dark Mode</Text>
           <Switch
@@ -139,20 +147,20 @@ export default function ProfileScreen() {
 
         <Pressable style={styles.row} onPress={() => {}}>
           <View style={[styles.rowIcon, { backgroundColor: "#8E8E93" }]}>
-            <FontAwesome name="cog" size={16} color="#fff" />
+            <Settings size={16} color="#fff" strokeWidth={2} />
           </View>
           <Text style={[styles.rowText, { color: textColor }]}>Settings</Text>
-          <FontAwesome name="chevron-right" size={14} color={secondaryText} />
+          <ChevronRight size={16} color={secondaryText} strokeWidth={2} />
         </Pressable>
 
         <View style={[styles.separator, { backgroundColor: separatorColor }]} />
 
         <Pressable style={styles.row} onPress={() => {}}>
           <View style={[styles.rowIcon, { backgroundColor: "#34C759" }]}>
-            <FontAwesome name="info-circle" size={16} color="#fff" />
+            <Info size={16} color="#fff" strokeWidth={2} />
           </View>
           <Text style={[styles.rowText, { color: textColor }]}>About</Text>
-          <FontAwesome name="chevron-right" size={14} color={secondaryText} />
+          <ChevronRight size={16} color={secondaryText} strokeWidth={2} />
         </Pressable>
       </View>
 

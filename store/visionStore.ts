@@ -38,6 +38,7 @@ export interface VisionItem {
   text: string;
   imageUri: string;
   createdAt: number;
+  startedAt?: number; // When the plan was activated
   milestones: Milestone[];
   userId?: string;
   
@@ -60,6 +61,7 @@ interface VisionState {
   updateItem: (id: string, updates: Partial<VisionItem>) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
   toggleMilestone: (itemId: string, milestoneId: string) => Promise<void>;
+  startPlan: (id: string) => Promise<void>;
 }
 
 export const useVisionStore = create<VisionState>((set, get) => ({
@@ -157,6 +159,16 @@ export const useVisionStore = create<VisionState>((set, get) => ({
       await updateDoc(docRef, { milestones: updatedMilestones });
     } catch (e: any) {
       console.error("Toggle milestone error:", e);
+      set({ error: e.message });
+    }
+  },
+
+  startPlan: async (id) => {
+    try {
+      const docRef = doc(db, 'vision_items', id);
+      await updateDoc(docRef, { startedAt: Date.now() });
+    } catch (e: any) {
+      console.error("Start plan error:", e);
       set({ error: e.message });
     }
   }
