@@ -21,6 +21,7 @@ import {
   generateSchedule,
   InterviewResponse,
 } from "@/services/ai";
+import { uploadToCloudinary } from "@/services/cloudinary";
 import { scheduleRegimen } from "@/services/notifications";
 import { generatePlanPDF } from "@/services/pdfGenerator";
 import { ScheduleItem, useVisionStore } from "@/store/visionStore";
@@ -131,9 +132,12 @@ export default function ModalScreen() {
 
     setSaving(true);
     try {
+      // Upload image to Cloudinary first
+      const cloudinaryUrl = await uploadToCloudinary(image);
+
       const itemData = {
         text: goalText,
-        imageUri: image,
+        imageUri: cloudinaryUrl, // Use Cloudinary URL instead of local URI
         interviewData: {
           questions: history.map((h) => ({ question: h.q, answer: h.a })),
           summary: "AI Generated",

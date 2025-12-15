@@ -33,8 +33,8 @@ export function InterviewStage({
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
-        <Text style={styles.title}>The Interview</Text>
-        <Text style={styles.subtitle}>Analyzing realistic capability...</Text>
+        <Text style={styles.title}>Let's Chat 💬</Text>
+        <Text style={styles.subtitle}>Quick questions, I promise!</Text>
       </View>
 
       <ScrollView
@@ -123,7 +123,7 @@ export function InterviewStage({
                 ]}
                 value={answer}
                 onChangeText={setAnswer}
-                placeholder="Type your excuse..."
+                placeholder="Share your thoughts..."
                 placeholderTextColor={secondaryText}
                 onSubmitEditing={submitAnswer}
                 returnKeyType="send"
