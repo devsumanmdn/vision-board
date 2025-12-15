@@ -36,7 +36,27 @@ export const scheduleRegimen = async (item: VisionItem) => {
   }
 
   for (const scheduleItem of item.schedule) {
-    const [hours, minutes] = scheduleItem.time.split(':').map(Number);
+    // Validate and parse time safely - skip items with non-schedulable times like "ASAP"
+    if (!scheduleItem.time || typeof scheduleItem.time !== 'string') {
+      console.warn(`Skipping notification: missing time for task "${scheduleItem.task}"`);
+      continue;
+    }
+    
+    // Check if it's a valid HH:mm format
+    const timeMatch = scheduleItem.time.match(/^(\d{1,2}):(\d{2})$/);
+    if (!timeMatch) {
+      console.warn(`Skipping notification: "${scheduleItem.time}" is not a valid time format for task "${scheduleItem.task}"`);
+      continue;
+    }
+    
+    const hours = parseInt(timeMatch[1], 10);
+    const minutes = parseInt(timeMatch[2], 10);
+    
+    // Validate hour and minute ranges
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      console.warn(`Skipping notification: invalid time range "${scheduleItem.time}" for task "${scheduleItem.task}"`);
+      continue;
+    }
     
     // For Android, use daily trigger; for iOS use weekly calendar trigger
     if (Platform.OS === 'android') {

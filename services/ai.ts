@@ -157,9 +157,10 @@ FORMAT (RESPOND WITH VALID JSON ONLY):
   "motivations": ["Motivating line 1", "Slightly sarcastic but supportive line 2"]
 }
 
-Notes:
+CRITICAL TIME FORMAT RULES:
+- time MUST be in 24hr format "HH:mm" (e.g., "08:00", "14:30", "21:00")
+- NO vague times like "ASAP", "morning", "flexible" - these break the app!
 - type: "daily" or "weekly"
-- time: 24hr format "HH:mm"
 - activeDays: 0=Sunday, 1=Monday, ..., 6=Saturday
 
 RESPOND WITH JSON ONLY.`;
