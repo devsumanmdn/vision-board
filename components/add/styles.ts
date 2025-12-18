@@ -209,4 +209,118 @@ export const addStyles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
+  // Voice Interview Stage
+  voiceContainer: {
+    flex: 1,
+    padding: 24,
+  },
+  voiceMainArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 24,
+  },
+  voiceLoadingContainer: {
+    alignItems: "center",
+    gap: 16,
+  },
+  voiceStatusText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  voiceOrbContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 20,
+  },
+  voiceOrb: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    borderWidth: 3,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  voiceOrbInner: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  voiceTranscriptContainer: {
+    flex: 1,
+    width: "100%",
+    paddingHorizontal: 16,
+  },
+  voiceTranscriptBubble: {
+    padding: 12,
+    borderRadius: 16,
+    maxWidth: "85%",
+    marginVertical: 4,
+  },
+  voiceTranscriptAi: {
+    backgroundColor: "rgba(60, 60, 70, 0.95)",
+    alignSelf: "flex-start",
+    borderBottomLeftRadius: 4,
+  },
+  voiceTranscriptUser: {
+    alignSelf: "flex-end",
+    borderBottomRightRadius: 4,
+  },
+  voiceTranscriptText: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  voiceControls: {
+    paddingVertical: 20,
+    gap: 16,
+  },
+  voiceTextInputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  voiceTextInput: {
+    flex: 1,
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    fontSize: 16,
+  },
+  voiceButtonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 24,
+  },
+  voiceSecondaryBtn: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  voiceMicButtonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  voiceMicPulse: {
+    position: "absolute",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  voiceMicButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
 });
+

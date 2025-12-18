@@ -1,7 +1,7 @@
 import { InterviewResponse } from "@/services/ai";
 import { ScheduleItem } from "@/store/visionStore";
 
-export type Stage = "SETUP" | "INTERVIEW" | "PROPOSAL";
+export type Stage = "SETUP" | "INTERVIEW" | "VOICE_INTERVIEW" | "PROPOSAL";
 
 export interface HistoryItem {
   q: string;
@@ -22,6 +22,7 @@ export interface SetupStageProps {
   image: string | null;
   pickImage: () => void;
   onContinue: () => void;
+  onVoiceContinue?: () => void;
   onClose: () => void;
   theme: ThemeColors;
 }
@@ -56,3 +57,12 @@ export interface PlanData {
   schedule: ScheduleItem[];
   createdAt?: number;
 }
+
+export interface VoiceInterviewStageProps {
+  goalText: string;
+  onComplete: (history: HistoryItem[]) => void;
+  onSwitchToText: () => void;
+  onClose: () => void;
+  theme: ThemeColors;
+}
+

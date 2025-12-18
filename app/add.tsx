@@ -12,6 +12,7 @@ import {
   Stage,
   addStyles as styles,
   ThemeColors,
+  VoiceInterviewStage,
 } from "@/components/add";
 import { useThemeColor } from "@/components/Themed";
 import { Colors } from "@/constants/Colors";
@@ -88,6 +89,44 @@ export default function ModalScreen() {
     setStage("INTERVIEW");
     try {
       const firstQ = await generateInterviewQuestion(goalText, []);
+      setCurrentQ(firstQ);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startVoiceInterview = () => {
+    setStage("VOICE_INTERVIEW");
+  };
+
+  const handleVoiceComplete = async (
+    voiceHistory: { q: string; a: string }[]
+  ) => {
+    setHistory(voiceHistory);
+    setLoading(true);
+    try {
+      const result = await generateSchedule(goalText, voiceHistory);
+      const scheduleWithIds = result.schedule.map((item, i) => ({
+        ...item,
+        id: `schedule-${Date.now()}-${i}`,
+      }));
+      setSchedule(scheduleWithIds);
+      setMotivations(result.motivations);
+      setStage("PROPOSAL");
+    } catch (e) {
+      console.error("Failed to generate schedule from voice interview:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const switchToTextInterview = async () => {
+    setStage("INTERVIEW");
+    setLoading(true);
+    try {
+      const firstQ = await generateInterviewQuestion(goalText, history);
       setCurrentQ(firstQ);
     } catch (e) {
       console.error(e);
@@ -173,6 +212,7 @@ export default function ModalScreen() {
   };
 
   const handleRedo = () => {
+    // Reset to text interview for redo
     setStage("INTERVIEW");
     setCurrentQ({
       question:
@@ -199,6 +239,17 @@ export default function ModalScreen() {
           image={image}
           pickImage={pickImage}
           onContinue={startInterview}
+          onVoiceContinue={startVoiceInterview}
+          onClose={handleClose}
+          theme={theme}
+        />
+      )}
+
+      {stage === "VOICE_INTERVIEW" && (
+        <VoiceInterviewStage
+          goalText={goalText}
+          onComplete={handleVoiceComplete}
+          onSwitchToText={switchToTextInterview}
           onClose={handleClose}
           theme={theme}
         />
